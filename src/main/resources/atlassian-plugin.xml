@@ -1,0 +1,19 @@
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+
+    <repository-hook key="examplehook" name="Bitrise Webhook" class="br.com.dextra.MyRepositoryHook">
+        <description>Webhook for notifying a configured endpoint of changes to this repository.</description>
+        <icon>icons/example.png</icon>
+        <config-form name="Simple Hook Config" key="simpleHook-config">
+            <view>stash.config.example.hook.simple.formContents</view>
+            <directory location="/static/"/>
+        </config-form>
+    </repository-hook>
+    
+</atlassian-plugin>
