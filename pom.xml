@@ -7,14 +7,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>bitrise-plugin</groupId>
     <artifactId>bitrise-plugin</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.1.0-beta</version>
 
     <organization>
-        <name>Example Company</name>
+        <name>Dextra</name>
         <url>http://www.example.com/</url>
     </organization>
 
-    <name>bitrise-plugin</name>
+    <name>Bitrise Hook</name>
     <description>This is the bitrise-plugin:bitrise-plugin plugin for Atlassian Stash.</description>
     <packaging>atlassian-plugin</packaging>
 

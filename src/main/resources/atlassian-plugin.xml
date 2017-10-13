@@ -7,7 +7,7 @@
         <param name="plugin-logo">images/pluginLogo.png</param>
     </plugin-info>
 
-    <repository-hook key="examplehook" name="Bitrise Webhook" class="br.com.dextra.MyRepositoryHook">
+    <repository-hook key="examplehook" name="Bitrise Webhook" class="br.com.dextra.RepositoryHook">
         <description>Webhook for notifying a configured endpoint of changes to this repository.</description>
         <icon>icons/example.png</icon>
         <config-form name="Simple Hook Config" key="simpleHook-config">

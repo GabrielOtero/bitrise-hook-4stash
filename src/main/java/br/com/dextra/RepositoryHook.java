@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class MyRepositoryHook implements AsyncPostReceiveRepositoryHook, RepositorySettingsValidator {
+public class RepositoryHook implements AsyncPostReceiveRepositoryHook, RepositorySettingsValidator {
 
     public void validate(@Nonnull Settings settings, @Nonnull SettingsValidationErrors settingsValidationErrors, @Nonnull Repository repository) {
 
