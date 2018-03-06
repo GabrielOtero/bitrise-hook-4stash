@@ -12,6 +12,22 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.stash:stash-api:3.11.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.analytics:analytics-api:3.70.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.crowd:embedded-crowd-api:2.8.4-m1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.stash:stash-spi:3.11.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.plugins:atlassian-plugins-core:3.2.21" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.utils:atlassian-processutils:1.7.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.jvnet.winp:winp:1.17-atlassian1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.stash:stash-page-objects:3.11.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.stash:stash-func-test-common:3.11.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.stash:stash-util:3.11.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.http:atlassian-http:1.1.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.cache:atlassian-cache-api:2.8.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.stash:stash-test-util:3.11.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-httpclient:commons-httpclient:3.1-atlassian-2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.integration.jira:jira-integration-page-objects:2.0.9" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.sal:sal-api:2.13.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.stash:stash-api:3.11.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.atlassian.analytics:analytics-api:3.70.1" level="project" />

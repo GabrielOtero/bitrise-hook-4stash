@@ -25,4 +25,22 @@
         {param extraClasses: 'long' /}
         {param errorTexts: $errors ? $errors['api_token'] : null /}
     {/call}
+    {call aui.form.textField}
+            {param id: 'push_workflow_name' /}
+            {param value: $config['push_workflow_name'] /}
+            {param labelContent}
+                {stash_i18n('stash.web.test.hook.config.label', 'Push Workflow Name')}
+            {/param}
+            {param descriptionText: stash_i18n('stash.web.test.hook.config.description', 'Name of workflow to trigger when push on a branch') /}
+            {param extraClasses: 'long' /}
+    {/call}
+    {call aui.form.textField}
+                {param id: 'tag_workflow_name' /}
+                {param value: $config['tag_workflow_name'] /}
+                {param labelContent}
+                    {stash_i18n('stash.web.test.hook.config.label', 'Tag Workflow Name')}
+                {/param}
+                {param descriptionText: stash_i18n('stash.web.test.hook.config.description', 'Name of workflow to trigger when create Tag') /}
+                {param extraClasses: 'long' /}
+        {/call}
 {/template}

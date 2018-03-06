@@ -25,6 +25,11 @@ import java.util.Collection;
 
 public class RepositoryHook implements AsyncPostReceiveRepositoryHook, RepositorySettingsValidator {
 
+    private static final String URL = "url";
+    private static final String API_TOKEN = "api_token";
+    private static final String PUSH_WORKFLOW_NAME = "push_workflow_name";
+    private static final String TAG_WORKFLOW_NAME = "tag_workflow_name";
+
     public void validate(@Nonnull Settings settings, @Nonnull SettingsValidationErrors settingsValidationErrors, @Nonnull Repository repository) {
 
     }
@@ -33,45 +38,95 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
      * Connects to a configured URL to notify of all changes.
      */
     public void postReceive(@Nonnull RepositoryHookContext repositoryHookContext, @Nonnull Collection<RefChange> collection) {
-        String url = repositoryHookContext.getSettings().getString("url");
-        String apiToken = repositoryHookContext.getSettings().getString("api_token");
+        String url = repositoryHookContext.getSettings().getString(URL);
+        String apiToken = repositoryHookContext.getSettings().getString(API_TOKEN);
 
-        SimpleRefChange simpleRefChange = (SimpleRefChange) (new ArrayList(collection)).get(0);
+        String pushWorkflow = repositoryHookContext.getSettings().getString(PUSH_WORKFLOW_NAME);
+        String tagWorkflow = repositoryHookContext.getSettings().getString(TAG_WORKFLOW_NAME);
 
-        boolean isUpdate = simpleRefChange.getType() == RefChangeType.UPDATE;
+        SimpleRefChange refChange = (SimpleRefChange) (new ArrayList(collection)).get(0);
 
-        if (url != null && isUpdate) {
+        if (url != null) {
+            String branchName = getBranchName(refChange.getRefId());
 
-            String branch = simpleRefChange.getRefId().split("/")[2]; // TODO
+            if (isPush(refChange)) {
+                onPush(url, apiToken, branchName, pushWorkflow);
+            }
 
-            try {
-                HttpClient httpclient = HttpClients.createDefault();
-                HttpPost httppost = new HttpPost(url);
-
-                Gson gson = new Gson();
-                String body = gson.toJson(new PostBody(branch, apiToken));
-
-                StringEntity stringEntity = new StringEntity(body);
-                httppost.setEntity(stringEntity);
-
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-
-                if (entity != null) {
-                    InputStream instream = entity.getContent();
-                    try {
-                        // do something useful
-                    } finally {
-                        instream.close();
-                    }
-                }
-            } catch (Exception e) {
-
+            if (isTag(refChange)) {
+                onTag(url, apiToken, branchName, tagWorkflow);
             }
         }
     }
 
-    public class PostBody{
+    String getBranchName(String refId) {
+        int indexOf = refId.indexOf("/", refId.indexOf("/") + 1);
+        return refId.substring(indexOf + 1, refId.length());
+    }
+
+    private void onTag(String url, String apiToken, String branch, String tagWorkflow) {
+        try {
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPost httppost = new HttpPost(url);
+
+            Gson gson = new Gson();
+            String body = gson.toJson(new PostBody(branch, apiToken, tagWorkflow));
+
+            StringEntity stringEntity = new StringEntity(body);
+            httppost.setEntity(stringEntity);
+
+            HttpResponse response = httpclient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                InputStream instream = entity.getContent();
+                try {
+                    // do something useful
+                } finally {
+                    instream.close();
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void onPush(String url, String apiToken, String branch, String pushWorkflow) {
+        try {
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPost httppost = new HttpPost(url);
+
+            Gson gson = new Gson();
+            String body = gson.toJson(new PostBody(branch, apiToken, pushWorkflow));
+
+            StringEntity stringEntity = new StringEntity(body);
+            httppost.setEntity(stringEntity);
+
+            HttpResponse response = httpclient.execute(httppost);
+            HttpEntity entity = response.getEntity();
+
+            if (entity != null) {
+                InputStream instream = entity.getContent();
+                try {
+                    // do something useful
+                } finally {
+                    instream.close();
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    private boolean isTag(SimpleRefChange simpleRefChange) {
+        return simpleRefChange.getType() == RefChangeType.ADD && simpleRefChange.getRefId().startsWith("refs/tags");
+    }
+
+    private boolean isPush(SimpleRefChange simpleRefChange) {
+        return simpleRefChange.getType() == RefChangeType.UPDATE;
+    }
+
+    public class PostBody {
         @SerializedName("hook_info")
         public HookInfo hookInfo;
 
@@ -81,9 +136,9 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
         @SerializedName("triggered_by")
         public String triggeredBy;
 
-        public PostBody(String branch, String apiToken) {
+        public PostBody(String branch, String apiToken, String workflow) {
             this.hookInfo = new HookInfo(apiToken);
-            this.buildParams = new BuildParams(branch);
+            this.buildParams = new BuildParams(branch, workflow);
             this.triggeredBy = "curl";
         }
 
@@ -123,8 +178,16 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
     private class BuildParams {
         public String branch;
 
-        public BuildParams(String branch) {
+        @SerializedName("workflow_id")
+        public String workFlowId;
+
+        public BuildParams(String branch, String workFlowId) {
             this.branch = branch;
+            this.workFlowId = workFlowId;
+        }
+
+        public String getWorkFlowId() {
+            return workFlowId;
         }
 
         public String getBranch() {
