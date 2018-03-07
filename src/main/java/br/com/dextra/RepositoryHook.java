@@ -1,5 +1,9 @@
 package br.com.dextra;
 
+import com.atlassian.sal.api.component.ComponentLocator;
+import com.atlassian.stash.commit.Commit;
+import com.atlassian.stash.commit.CommitService;
+import com.atlassian.stash.commit.CommitsBetweenRequest;
 import com.atlassian.stash.hook.repository.AsyncPostReceiveRepositoryHook;
 import com.atlassian.stash.hook.repository.RepositoryHookContext;
 import com.atlassian.stash.repository.RefChange;
@@ -9,6 +13,8 @@ import com.atlassian.stash.repository.SimpleRefChange;
 import com.atlassian.stash.setting.RepositorySettingsValidator;
 import com.atlassian.stash.setting.Settings;
 import com.atlassian.stash.setting.SettingsValidationErrors;
+import com.atlassian.stash.util.Page;
+import com.atlassian.stash.util.PageUtils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import org.apache.http.HttpEntity;
@@ -44,19 +50,36 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
         String pushWorkflow = repositoryHookContext.getSettings().getString(PUSH_WORKFLOW_NAME);
         String tagWorkflow = repositoryHookContext.getSettings().getString(TAG_WORKFLOW_NAME);
 
-        SimpleRefChange refChange = (SimpleRefChange) (new ArrayList(collection)).get(0);
+        ArrayList<RefChange> refChangeList = new ArrayList<RefChange>(collection);
+        SimpleRefChange refChange = (SimpleRefChange) refChangeList.get(0);
 
         if (url != null) {
             String branchName = getBranchName(refChange.getRefId());
 
             if (isPush(refChange)) {
-                onPush(url, apiToken, branchName, pushWorkflow);
+                String commitMessages = concatCommitMessages(repositoryHookContext.getRepository(), refChange);
+                onPush(url, apiToken, branchName, pushWorkflow, commitMessages);
             }
 
             if (isTag(refChange)) {
                 onTag(url, apiToken, branchName, tagWorkflow);
             }
         }
+    }
+
+    String concatCommitMessages(Repository repository, SimpleRefChange refChange) {
+        CommitsBetweenRequest request = new CommitsBetweenRequest.Builder(repository)
+                .exclude(refChange.getFromHash())
+                .include(refChange.getToHash())
+                .build();
+        CommitService commitService = ComponentLocator.getComponent(CommitService.class);
+        Page<Commit> page = commitService.getCommitsBetween(request, PageUtils.newRequest(0, 100));
+
+        StringBuilder sb = new StringBuilder();
+        for (Commit commit : page.getValues()) {
+            sb.append(commit.getMessage() + "\n");
+        }
+        return sb.toString();
     }
 
     String getBranchName(String refId) {
@@ -70,7 +93,7 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
             HttpPost httppost = new HttpPost(url);
 
             Gson gson = new Gson();
-            String body = gson.toJson(new PostBody(branch, apiToken, tagWorkflow));
+            String body = gson.toJson(new PostBody(branch, apiToken, tagWorkflow, null));
 
             StringEntity stringEntity = new StringEntity(body);
             httppost.setEntity(stringEntity);
@@ -91,13 +114,13 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
         }
     }
 
-    private void onPush(String url, String apiToken, String branch, String pushWorkflow) {
+    private void onPush(String url, String apiToken, String branch, String pushWorkflow, String commitMessage) {
         try {
             HttpClient httpclient = HttpClients.createDefault();
             HttpPost httppost = new HttpPost(url);
 
             Gson gson = new Gson();
-            String body = gson.toJson(new PostBody(branch, apiToken, pushWorkflow));
+            String body = gson.toJson(new PostBody(branch, apiToken, pushWorkflow, commitMessage));
 
             StringEntity stringEntity = new StringEntity(body);
             httppost.setEntity(stringEntity);
@@ -136,9 +159,9 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
         @SerializedName("triggered_by")
         public String triggeredBy;
 
-        public PostBody(String branch, String apiToken, String workflow) {
+        public PostBody(String branch, String apiToken, String workflow, String commitMessage) {
             this.hookInfo = new HookInfo(apiToken);
-            this.buildParams = new BuildParams(branch, workflow);
+            this.buildParams = new BuildParams(branch, workflow, commitMessage);
             this.triggeredBy = "curl";
         }
 
@@ -178,12 +201,16 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
     private class BuildParams {
         public String branch;
 
+        @SerializedName("commit_message")
+        public String commitMessage;
+
         @SerializedName("workflow_id")
         public String workFlowId;
 
-        public BuildParams(String branch, String workFlowId) {
+        public BuildParams(String branch, String workFlowId, String commitMessage) {
             this.branch = branch;
             this.workFlowId = workFlowId;
+            this.commitMessage = commitMessage;
         }
 
         public String getWorkFlowId() {
@@ -192,6 +219,10 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
 
         public String getBranch() {
             return branch;
+        }
+
+        public String getCommitMessage() {
+            return commitMessage;
         }
     }
 }
