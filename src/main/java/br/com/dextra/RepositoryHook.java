@@ -35,6 +35,8 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
     private static final String API_TOKEN = "api_token";
     private static final String PUSH_WORKFLOW_NAME = "push_workflow_name";
     private static final String TAG_WORKFLOW_NAME = "tag_workflow_name";
+    public static final String SKIP_CI = "[skip ci]";
+    public static final String CI_SKIP = "[ci skip]";
 
     public void validate(@Nonnull Settings settings, @Nonnull SettingsValidationErrors settingsValidationErrors, @Nonnull Repository repository) {
 
@@ -115,6 +117,9 @@ public class RepositoryHook implements AsyncPostReceiveRepositoryHook, Repositor
     }
 
     private void onPush(String url, String apiToken, String branch, String pushWorkflow, String commitMessage) {
+        if (commitMessage != null && (commitMessage.contains(SKIP_CI) || commitMessage.contains(CI_SKIP))) {
+            return;
+        }
         try {
             HttpClient httpclient = HttpClients.createDefault();
             HttpPost httppost = new HttpPost(url);
