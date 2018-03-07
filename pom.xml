@@ -183,5 +183,47 @@
         <!-- This key is used to keep the consistency between the key in atlassian-plugin.xml and the key to generate bundle. -->
         <atlassian.plugin.key>${project.groupId}.${project.artifactId}</atlassian.plugin.key>
     </properties>
-    
+
+    <repositories>
+        <repository>
+            <id>maven-public</id>
+            <url>https://maven.atlassian.com/maven-public</url>
+        </repository>
+        <repository>
+            <id>maven-public-legacy</id>
+            <url>https://maven.atlassian.com/maven-public-legacy</url>
+        </repository>
+        <repository>
+            <id>maven-3rdparty-legacy</id>
+            <url>https://maven.atlassian.com/maven-3rdparty-legacy</url>
+        </repository>
+        <repository>
+            <id>maven-closedsource-legacy</id>
+            <url>https://maven.atlassian.com/maven-closedsource-legacy</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven-public</id>
+            <url>https://maven.atlassian.com/maven-public</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven-public-legacy</id>
+            <url>https://maven.atlassian.com/maven-public-legacy</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven-3rdparty</id>
+            <url>https://maven.atlassian.com/maven-3rdparty</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven-3rdparty-legacy</id>
+            <url>https://maven.atlassian.com/maven-3rdparty-legacy</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven-closedsource-legacy</id>
+            <url>https://maven.atlassian.com/maven-closedsource-legacy</url>
+        </pluginRepository>
+    </pluginRepositories>
+
 </project>
